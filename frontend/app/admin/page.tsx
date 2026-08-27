@@ -8,12 +8,14 @@ export default async function AdminPage() {
 
   return (
     <main style={{ padding: "var(--space-6)" }}>
-      <h1>Area administrativa</h1>
-      <p className="caption">Sesion: {session?.sub}</p>
+      <h1>Área administrativa</h1>
+      <p className="caption">Sesión: {session?.sub}</p>
       <p style={{ marginTop: "var(--space-4)" }}>
-        Proximamente: gestion de usuarios y accesos, metricas tecnicas y estado del sistema.
+        Próximamente: gestión de usuarios y accesos, métricas técnicas y estado del sistema.
       </p>
-      <LogoutButton />
+      <div style={{ marginTop: "var(--space-6)" }}>
+        <LogoutButton />
+      </div>
     </main>
   );
 }

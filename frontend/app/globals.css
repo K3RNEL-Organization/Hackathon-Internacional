@@ -77,3 +77,192 @@ input {
 a {
   color: var(--color-action);
 }
+
+/* Priority badge (pautas-UI.md #5, #10) */
+.priority-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.priority-low {
+  background-color: var(--color-low);
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12);
+}
+
+.priority-medium {
+  background-color: var(--color-medium);
+  box-shadow: 0 0 0 4px rgba(234, 179, 8, 0.12);
+}
+
+.priority-high {
+  background-color: var(--color-high);
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.12);
+}
+
+.priority-critical {
+  background-color: var(--color-critical);
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12);
+}
+
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 12px;
+  font-weight: 600;
+  padding: var(--space-1) var(--space-3);
+  border-radius: 999px;
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+}
+
+/* Cards (pautas-UI.md #9) */
+.card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+}
+
+.card-clickable {
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  text-align: left;
+  width: 100%;
+}
+
+.card-clickable:hover,
+.card-clickable:focus-visible {
+  border-color: var(--color-action);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.card-clickable:focus-visible {
+  outline: none;
+}
+
+/* Buttons */
+.btn {
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-4);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-primary {
+  background-color: var(--color-action);
+  color: #ffffff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--color-action-hover);
+}
+
+.btn-secondary {
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  border-color: var(--color-action);
+  color: var(--color-action);
+}
+
+/* Filter chips */
+.filter-chip {
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+}
+
+.filter-chip:hover {
+  border-color: var(--color-action);
+  color: var(--color-action);
+}
+
+.filter-chip-active {
+  background-color: var(--color-action);
+  border-color: var(--color-action);
+  color: #ffffff;
+}
+
+.filter-chip-active:hover {
+  color: #ffffff;
+}
+
+/* Empty / error states (pautas-UI.md #15) */
+.state-panel {
+  text-align: center;
+  padding: var(--space-7) var(--space-5);
+  color: var(--color-text-secondary);
+}
+
+/* Loading skeleton */
+.skeleton {
+  background: linear-gradient(90deg, var(--color-border) 25%, #eef1f5 37%, var(--color-border) 63%);
+  background-size: 400% 100%;
+  animation: skeleton-loading 1.4s ease infinite;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+/* Header responsive nav (pautas-UI.md #16, #20) */
+.app-header-nav {
+  display: flex;
+  gap: var(--space-5);
+}
+
+.app-header-toggle {
+  display: none;
+  font-size: 18px;
+  line-height: 1;
+  padding: var(--space-2) var(--space-3);
+}
+
+.app-header-mobile-menu {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .app-header-nav,
+  .app-header-desktop-actions {
+    display: none;
+  }
+
+  .app-header-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .app-header-mobile-menu {
+    display: flex;
+  }
+}

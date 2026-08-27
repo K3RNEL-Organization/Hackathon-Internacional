@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
 
   if (!body || typeof body.email !== "string" || typeof body.password !== "string") {
-    return NextResponse.json({ message: "Solicitud invalida." }, { status: 400 });
+    return NextResponse.json({ message: "Solicitud inválida." }, { status: 400 });
   }
 
   let backendResponse: Response;
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     });
   } catch {
     return NextResponse.json(
-      { message: "No fue posible iniciar sesion. Intente nuevamente." },
+      { message: "No fue posible iniciar sesión. Intente nuevamente." },
       { status: 502 }
     );
   }
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
   if (!backendResponse.ok) {
     return NextResponse.json(
-      { message: "No fue posible iniciar sesion. Intente nuevamente." },
+      { message: "No fue posible iniciar sesión. Intente nuevamente." },
       { status: 502 }
     );
   }

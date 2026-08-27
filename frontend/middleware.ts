@@ -3,6 +3,8 @@ import { SESSION_COOKIE, roleHomePath, verifySessionToken } from "./lib/session"
 
 const ROUTE_ROLES: Record<string, "PROFESIONAL_SALUD" | "ADMINISTRADOR"> = {
   "/dashboard": "PROFESIONAL_SALUD",
+  "/pacientes": "PROFESIONAL_SALUD",
+  "/senales": "PROFESIONAL_SALUD",
   "/admin": "ADMINISTRADOR",
 };
 
@@ -33,5 +35,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/admin/:path*"],
+  matcher: ["/dashboard/:path*", "/pacientes/:path*", "/senales/:path*", "/admin/:path*"],
 };

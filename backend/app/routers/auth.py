@@ -39,11 +39,11 @@ def get_current_user(
 
     payload = decode_access_token(credentials.credentials)
     if payload is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Sesion invalida o expirada.")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Sesión inválida o expirada.")
 
     user = db.query(User).filter(User.email == payload.get("sub")).first()
     if user is None or not user.is_active:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Sesion invalida o expirada.")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Sesión inválida o expirada.")
 
     return user
 
@@ -51,3 +51,15 @@ def get_current_user(
 @router.get("/me", response_model=UserOut)
 def me(current_user: User = Depends(get_current_user)) -> UserOut:
     return UserOut.model_validate(current_user)
+
+
+def require_role(*roles: str):
+    def dependency(current_user: User = Depends(get_current_user)) -> User:
+        if current_user.role.value not in roles:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="No tiene permisos para acceder a este recurso.",
+            )
+        return current_user
+
+    return dependency

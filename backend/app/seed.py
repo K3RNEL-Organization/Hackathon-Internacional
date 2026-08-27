@@ -8,7 +8,7 @@ SEED_USERS = [
     {
         "email": "profesional@risadata.com",
         "password": "Profesional#2026",
-        "full_name": "Dra. Valentina Rios",
+        "full_name": "Dra. Valentina Ríos",
         "role": UserRole.PROFESIONAL_SALUD,
     },
     {

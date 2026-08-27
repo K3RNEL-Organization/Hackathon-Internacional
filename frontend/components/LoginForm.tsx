@@ -26,11 +26,11 @@ export function LoginForm() {
     if (!email.trim()) {
       errors.email = "El correo es obligatorio.";
     } else if (!EMAIL_PATTERN.test(email.trim())) {
-      errors.email = "Ingrese un correo electronico valido.";
+      errors.email = "Ingrese un correo electrónico válido.";
     }
 
     if (!password) {
-      errors.password = "La contrasena es obligatoria.";
+      errors.password = "La contraseña es obligatoria.";
     }
 
     setFieldErrors(errors);
@@ -61,7 +61,7 @@ export function LoginForm() {
       }
 
       if (!response.ok) {
-        setFormError("No fue posible iniciar sesion. Intente nuevamente.");
+        setFormError("No fue posible iniciar sesión. Intente nuevamente.");
         return;
       }
 
@@ -69,7 +69,7 @@ export function LoginForm() {
       router.push(homePath);
       router.refresh();
     } catch {
-      setFormError("No fue posible iniciar sesion. Intente nuevamente.");
+      setFormError("No fue posible iniciar sesión. Intente nuevamente.");
     } finally {
       setIsSubmitting(false);
     }
@@ -92,19 +92,19 @@ export function LoginForm() {
       </div>
 
       <h1 style={{ fontSize: 20, textAlign: "center", marginBottom: "var(--space-1)" }}>
-        Iniciar sesion
+        Iniciar sesión
       </h1>
       <p
         className="caption"
         style={{ textAlign: "center", marginBottom: "var(--space-5)" }}
       >
-        Accede al panel clinico de senales de riesgo
+        Accede al panel clínico de señales de riesgo
       </p>
 
       <form onSubmit={handleSubmit} noValidate>
         <div style={{ marginBottom: "var(--space-4)" }}>
           <label htmlFor="email" style={labelStyle}>
-            Correo electronico
+            Correo electrónico
           </label>
           <input
             id="email"
@@ -126,7 +126,7 @@ export function LoginForm() {
 
         <div style={{ marginBottom: "var(--space-5)" }}>
           <label htmlFor="password" style={labelStyle}>
-            Contrasena
+            Contraseña
           </label>
           <div style={{ position: "relative" }}>
             <input
@@ -143,7 +143,7 @@ export function LoginForm() {
             <button
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
-              aria-label={showPassword ? "Ocultar contrasena" : "Mostrar contrasena"}
+              aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
               style={toggleButtonStyle}
             >
               {showPassword ? "Ocultar" : "Mostrar"}
