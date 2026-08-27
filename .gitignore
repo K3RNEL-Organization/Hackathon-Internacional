@@ -4,3 +4,12 @@ data/processed/
 .venv/
 __pycache__/
 *.pyc
+
+# backend
+backend/risa_data.db
+backend/.env
+
+# frontend
+frontend/node_modules/
+frontend/.next/
+frontend/.env.local
