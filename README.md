@@ -27,43 +27,29 @@ merecen revisión profesional.
 
 La arquitectura implementada es la siguiente:
 
-RISA Data V1.0
-│
-▼
-Validación y normalización
-│
-▼
-Timeline temporal
-│
-▼
-Baseline personal
-│
-▼
-Ventanas temporales
-│
-▼
-Detección multivariable
-│
-├──── Wearables / actividad
-├──── Calidad del dispositivo
-├──── Conectividad
-├──── Patient Context
-└──── Laboratorios
-│
-▼
-Risk Score
-│
-▼
-Priorización
-│
-▼
-signals.csv + evidence.csv
-│
-▼
-Backend / API
-│
-▼
-Dashboard TriageMed
+graph TD
+    A[RISA Data V1.0] --> B[Validación y normalización]
+    B --> C[Timeline temporal]
+    C --> D[Baseline personal]
+    D --> E[Ventanas temporales]
+    E --> F[Detección multivariable]
+    
+    F --> F1[Wearables / actividad]
+    F --> F2[Calidad del dispositivo]
+    F --> F3[Conectividad]
+    F --> F4[Patient Context]
+    F --> F5[Laboratorios]
+    
+    F1 & F2 & F3 & F4 & F5 --> G[Risk Score]
+    
+    G --> H[Priorización]
+    H --> I[signals.csv + evidence.csv]
+    I --> J[Backend / API]
+    J --> K[Dashboard TriageMed]
+
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style K fill:#bbf,stroke:#333,stroke-width:2px
+
 
 # Fuentes RISA utilizadas
 
