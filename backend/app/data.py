@@ -12,6 +12,7 @@ MEDICATION_ADMINISTRATIONS_PATH = (
 )
 VITAL_SIGNS_FINAL_PATH = REPO_ROOT / "data" / "processed" / "vital_signs_final.parquet"
 LABORATORY_RESULTS_PATH = REPO_ROOT / "data" / "raw" / "laboratory_results.csv"
+ALERT_FUNNEL_SUMMARY_PATH = REPO_ROOT / "data" / "processed" / "alert_funnel_summary.json"
 
 _signals_cache: pd.DataFrame | None = None
 _evidence_cache: pd.DataFrame | None = None
@@ -20,6 +21,7 @@ _encounters_cache: pd.DataFrame | None = None
 _medication_administrations_cache: pd.DataFrame | None = None
 _vital_signs_quality_cache: pd.DataFrame | None = None
 _lab_results_cache: pd.DataFrame | None = None
+_alert_funnel_summary_cache: dict | None = None
 _lock = Lock()
 
 
@@ -111,6 +113,20 @@ def get_lab_results_df() -> pd.DataFrame:
             )
             _lab_results_cache = df
         return _lab_results_cache.copy()
+
+
+def get_alert_funnel_summary() -> dict:
+    """Precomputed funnel counts from src/risk/audit_alert_funnel.py, a
+    read-only audit that reproduces run_pipeline_v03.py's exact windowing/
+    z-score/persistence logic solely to count how many windows pass each
+    stage. Does not recompute or alter risk_score, priorities or signals.csv."""
+    global _alert_funnel_summary_cache
+    with _lock:
+        if _alert_funnel_summary_cache is None:
+            import json
+
+            _alert_funnel_summary_cache = json.loads(ALERT_FUNNEL_SUMMARY_PATH.read_text(encoding="utf-8"))
+        return dict(_alert_funnel_summary_cache)
 
 
 def patient_exists(patient_id: str) -> bool:

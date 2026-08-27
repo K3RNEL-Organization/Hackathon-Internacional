@@ -11,6 +11,7 @@ const NAV_LINKS = [
   { href: "/pacientes", label: "Pacientes", icon: "⌁" },
   { href: "/senales", label: "Señales", icon: "▥" },
   { href: "/calidad-datos", label: "Calidad de datos", icon: "◎" },
+  { href: "/control-alertas", label: "Control de alertas", icon: "▽" },
 ];
 
 const ROLE_DISPLAY_LABEL: Record<CurrentUser["role"], string> = {

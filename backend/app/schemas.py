@@ -152,6 +152,17 @@ class DataQualityIssuesPageOut(BaseModel):
     page_size: int
 
 
+class AlertFunnelSummaryOut(BaseModel):
+    windows_evaluated: int
+    windows_with_deviation: int
+    windows_with_multivariable_deviation: int
+    persistence_confirmed_cases: int
+    consolidated_episodes: int
+    final_signals: int
+    retransmissions_excluded: int
+    candidate_reduction_pct: float
+
+
 class SignalDetailOut(BaseModel):
     model_config = {"protected_namespaces": ()}
 

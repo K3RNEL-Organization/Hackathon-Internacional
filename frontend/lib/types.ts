@@ -196,6 +196,17 @@ export interface DataQualityIssuesPage {
   page_size: number;
 }
 
+export interface AlertFunnelSummary {
+  windows_evaluated: number;
+  windows_with_deviation: number;
+  windows_with_multivariable_deviation: number;
+  persistence_confirmed_cases: number;
+  consolidated_episodes: number;
+  final_signals: number;
+  retransmissions_excluded: number;
+  candidate_reduction_pct: number;
+}
+
 export interface SignalDetail {
   signal_id: string;
   patient_id: string;
