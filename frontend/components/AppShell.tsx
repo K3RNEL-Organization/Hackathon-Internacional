@@ -13,12 +13,12 @@ const NAV_LINKS = [
 ];
 
 const ROLE_DISPLAY_LABEL: Record<CurrentUser["role"], string> = {
-  PROFESIONAL_SALUD: "Profesional de salud",
+  PROFESIONAL_SALUD: "Martina Gómez",
   ADMINISTRADOR: "Administrador",
 };
 
 const ROLE_AVATAR_LABEL: Record<CurrentUser["role"], string> = {
-  PROFESIONAL_SALUD: "PS",
+  PROFESIONAL_SALUD: "MG",
   ADMINISTRADOR: "AD",
 };
 
@@ -65,7 +65,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       />
       <aside className={`sidebar ${isSidebarOpen ? "sidebar--open" : ""}`}>
         <div className="sidebar__brand">
-          <Image src="/logo.png" alt="RISA Data" width={150} height={31} priority />
+          <Image src="/logo.png" alt="RISA Data" width={150} height={35} priority />
         </div>
 
         {showProfessionalNav && (
@@ -97,7 +97,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <strong style={{ display: "block", fontSize: 13 }}>
                   {user ? ROLE_DISPLAY_LABEL[user.role] : "Cargando..."}
                 </strong>
-                <small style={{ color: "#8bb4bc" }}>Sesión de demostración</small>
               </span>
             </button>
 
