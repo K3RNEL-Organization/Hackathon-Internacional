@@ -1,0 +1,647 @@
+:root {
+  --color-background: #f5f8fb;
+  --color-surface: #ffffff;
+  --color-border: #e2e8f0;
+
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #64748b;
+  --color-text-muted: #94a3b8;
+
+  --color-low: #22c55e;
+  --color-medium: #eab308;
+  --color-high: #f97316;
+  --color-critical: #ef4444;
+
+  --color-action: #155e75;
+  --color-action-hover: #0e4658;
+  --color-brand-soft: #e6f5f7;
+  --color-sidebar-bg: #073b4c;
+
+  --color-error: #dc2626;
+  --color-error-bg: #fef2f2;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  --sidebar-width: 248px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-dm-sans), system-ui, sans-serif;
+  color: var(--color-text-primary);
+  background-color: var(--color-background);
+  font-size: 14px;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-space-grotesk), system-ui, sans-serif;
+  margin: 0;
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+h2 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.caption {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+a {
+  color: var(--color-action);
+}
+
+/* Priority badge (pautas-UI.md #5, #10) */
+.priority-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.priority-low {
+  background-color: var(--color-low);
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12);
+}
+
+.priority-medium {
+  background-color: var(--color-medium);
+  box-shadow: 0 0 0 4px rgba(234, 179, 8, 0.12);
+}
+
+.priority-high {
+  background-color: var(--color-high);
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.12);
+}
+
+.priority-critical {
+  background-color: var(--color-critical);
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12);
+}
+
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 12px;
+  font-weight: 600;
+  padding: var(--space-1) var(--space-3);
+  border-radius: 999px;
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+}
+
+/* Cards (pautas-UI.md #9) */
+.card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+}
+
+.card-clickable {
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  text-align: left;
+  width: 100%;
+}
+
+.card-clickable:hover,
+.card-clickable:focus-visible {
+  border-color: var(--color-action);
+  box-shadow: 0 7px 18px rgba(15, 23, 42, 0.07);
+  transform: translateY(-2px);
+}
+
+.card-clickable:focus-visible {
+  outline: none;
+}
+
+/* Case card: card with a left priority-colored border (pautas-UI.md #22.1) */
+.case-card {
+  border-left: 3px solid var(--color-border);
+}
+
+.case-card--low {
+  border-left-color: var(--color-low);
+}
+
+.case-card--medium {
+  border-left-color: var(--color-medium);
+}
+
+.case-card--high {
+  border-left-color: var(--color-high);
+}
+
+.case-card--critical {
+  border-left-color: var(--color-critical);
+}
+
+/* Buttons */
+.btn {
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-4);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-primary {
+  background-color: var(--color-action);
+  color: #ffffff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--color-action-hover);
+}
+
+.btn-secondary {
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  border-color: var(--color-action);
+  color: var(--color-action);
+}
+
+/* Filter chips */
+.filter-chip {
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+}
+
+.filter-chip:hover {
+  border-color: var(--color-action);
+  color: var(--color-action);
+}
+
+.filter-chip-active {
+  background-color: var(--color-action);
+  border-color: var(--color-action);
+  color: #ffffff;
+}
+
+.filter-chip-active:hover {
+  color: #ffffff;
+}
+
+/* Empty / error states (pautas-UI.md #15) */
+.state-panel {
+  text-align: center;
+  padding: var(--space-7) var(--space-5);
+  color: var(--color-text-secondary);
+}
+
+/* Loading skeleton */
+.skeleton {
+  background: linear-gradient(90deg, var(--color-border) 25%, #eef1f5 37%, var(--color-border) 63%);
+  background-size: 400% 100%;
+  animation: skeleton-loading 1.4s ease infinite;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+/* ---------- App shell: Sidebar + Topbar (pautas-UI.md #20) ---------- */
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--color-sidebar-bg);
+  color: #d8f0f2;
+  padding: 24px 16px 18px;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 20;
+  transition: transform 0.2s ease;
+}
+
+.sidebar__brand {
+  padding: 0 8px 32px;
+}
+
+.sidebar__nav {
+  display: grid;
+  gap: 6px;
+}
+
+.sidebar__link {
+  text-decoration: none;
+  color: #9ec4ca;
+  padding: 11px 12px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.sidebar__link:hover,
+.sidebar__link--active {
+  background: rgba(255, 255, 255, 0.11);
+  color: #ffffff;
+}
+
+.sidebar__footer {
+  margin-top: auto;
+}
+
+.sidebar__status {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.13);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.13);
+  padding: 16px 8px;
+  margin-bottom: 12px;
+  font-size: 11px;
+  color: #8bb4bc;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  min-width: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  background: var(--color-text-muted);
+}
+
+.status-dot--online {
+  background: #54d39c;
+  box-shadow: 0 0 0 4px rgba(84, 211, 156, 0.12);
+}
+
+.sidebar__profile {
+  border: 0;
+  background: none;
+  color: #ffffff;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-align: left;
+  width: 100%;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.sidebar__profile:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.avatar {
+  border: 0;
+  background: #d7edf0;
+  color: var(--color-action-hover);
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.sidebar__overlay {
+  display: none;
+}
+
+.app-main {
+  margin-left: var(--sidebar-width);
+  width: calc(100% - var(--sidebar-width));
+  min-width: 0;
+}
+
+.topbar {
+  height: 64px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-6);
+}
+
+.topbar__menu-button {
+  display: none;
+}
+
+.icon-button {
+  border: 0;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 17px;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    transform: translateX(-100%);
+    box-shadow: 8px 0 20px rgba(0, 0, 0, 0.12);
+  }
+
+  .sidebar--open {
+    transform: translateX(0);
+  }
+
+  .sidebar__overlay--open {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(7, 59, 76, 0.35);
+    z-index: 15;
+  }
+
+  .app-main {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .topbar {
+    padding: 0 var(--space-4);
+  }
+
+  .topbar__menu-button {
+    display: inline-flex;
+  }
+}
+
+/* ---------- KPI card (pautas-UI.md #22.1) ---------- */
+
+.kpi-card {
+  position: relative;
+}
+
+.kpi-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.kpi-icon {
+  width: 25px;
+  height: 25px;
+  min-width: 25px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: var(--color-brand-soft);
+  color: var(--color-action);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.kpi-card__value {
+  font-family: var(--font-space-grotesk), system-ui, sans-serif;
+  font-size: 30px;
+  font-weight: 600;
+  margin: 12px 0 0;
+}
+
+/* ---------- Priority distribution bar (pautas-UI.md #22.1) ---------- */
+
+.priority-distribution-bar {
+  height: 12px;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  gap: 2px;
+  background: var(--color-border);
+}
+
+.priority-distribution-bar span {
+  min-width: 2px;
+}
+
+.priority-legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: var(--space-3);
+}
+
+.priority-legend__item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 6px;
+}
+
+.priority-legend__item strong {
+  grid-column: 2;
+  font-family: var(--font-space-grotesk), system-ui, sans-serif;
+  font-size: 18px;
+  margin-top: 3px;
+}
+
+.priority-legend__item small {
+  grid-column: 2;
+  color: var(--color-text-muted);
+}
+
+/* ---------- Responsive card grid (pautas-UI.md #16): 1 col mobile / 2 tablet / 3 desktop ---------- */
+
+.card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .card-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ---------- Breadcrumb navigation ---------- */
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-4);
+}
+
+.breadcrumb a {
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  color: var(--color-action);
+  text-decoration: underline;
+}
+
+.breadcrumb__current {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.breadcrumb__separator {
+  color: var(--color-text-muted);
+}
+
+/* ---------- Vertical timeline (pautas-UI.md #12 Vista de detalle) ---------- */
+
+.vertical-timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.vertical-timeline__item {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.vertical-timeline__rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 16px;
+}
+
+.vertical-timeline__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 2px solid var(--color-text-muted);
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.vertical-timeline__dot--priority {
+  border-width: 3px;
+}
+
+.vertical-timeline__line {
+  flex: 1;
+  width: 2px;
+  background: var(--color-border);
+  min-height: var(--space-4);
+}
+
+.vertical-timeline__content {
+  flex: 1;
+  padding-bottom: var(--space-5);
+}
+
+/* ---------- Evidence role badges (pautas-UI.md #10, #11) ---------- */
+
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 2px var(--space-2);
+  border-radius: 999px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.role-badge--primary {
+  background: var(--color-brand-soft);
+  color: var(--color-action-hover);
+  border-color: var(--color-action);
+}
+
+.role-badge--supporting {
+  background: #eef2ff;
+  color: #4338ca;
+  border-color: #c7d2fe;
+}
+
+.role-badge--context {
+  background: var(--color-background);
+  color: var(--color-text-secondary);
+  border-color: var(--color-border);
+}
+
+.role-badge--quality {
+  background: #f3e8ff;
+  color: #7e22ce;
+  border-color: #e9d5ff;
+}

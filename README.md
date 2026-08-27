@@ -1,303 +1,146 @@
-# TriageMed — HealthSignal LATAM / RISA Data V1.0
+# 1. Encabezado
 
-TriageMed es un sistema de detección temprana y priorización de señales a partir de datos multifuente, desarrollado para el desafío HealthSignal LATAM.
+TriageMed es un prototipo desarrollado para HealthSignal LATAM utilizando
+RISA Data V1.0.
 
-El objetivo del sistema no es realizar diagnósticos clínicos, sino detectar desviaciones relevantes respecto del comportamiento basal de cada paciente, priorizarlas y entregar evidencia trazable disponible al momento de la decisión.
+El sistema integra información fisiológica, clínica, contextual y tecnológica
+para identificar desviaciones respecto del comportamiento basal de cada
+paciente, analizar su persistencia temporal, priorizar señales y proporcionar
+evidencia trazable disponible al momento de la decisión.
 
----
+Cabe aclarar que:
 
-## Pipeline principal
+- TriageMed es una herramienta tecnológica de apoyo.
+- No genera diagnósticos, prescripciones ni decisiones clínicas autónomas.
 
-El pipeline principal se encuentra en:
+# 2. Problema
 
-```text
-src/risk/run_pipeline_v03.py
+Los datos de salud pueden encontrarse fragmentados entre signos vitales,
+wearables, laboratorios, dispositivos y fuentes contextuales.
+
+Una alteración individual no necesariamente representa una situación relevante.
+TriageMed busca analizar conjuntamente la evolución temporal, el baseline
+personal, el contexto y la calidad de los datos para detectar patrones que
+merecen revisión profesional.
+
+# 3. Arquitectura
+
+La arquitectura implementada es la siguiente:
+
+```mermaid
+flowchart TD
+    A[RISA Data V1.0] --> B[Validación y normalización]
+    B --> C[Timeline temporal]
+    C --> D[Baseline personal]
+    D --> E[Ventanas temporales]
+    E --> F[Detección multivariable]
+
+    F --> F1[Wearables / actividad]
+    F --> F2[Calidad del dispositivo]
+    F --> F3[Conectividad]
+    F --> F4[Patient Context]
+    F --> F5[Laboratorios]
+
+    F --> G[Risk Score]
+    G --> H[Priorización]
+    H --> I[signals.csv + evidence.csv]
+    I --> J[Backend / API]
+    J --> K[Dashboard TriageMed]
 ```
 
-Ejecutar desde la raíz del proyecto:
+# 4. Fuentes RISA utilizadas
 
-```bash
-python src/risk/run_pipeline_v03.py
-```
+Las fuentes RISA utilizadas fueron:
 
----
+- vital_signs.csv
+- wearable_observations.csv
+- device_observations.csv
+- patient_context.csv
+- connectivity_events.csv
+- laboratory_results.csv
 
-## Fuentes utilizadas
+# 5. Tecnologías utilizadas
 
-El motor integra:
+Se emplearon las siguientes tecnologías:
 
-- `vital_signs.csv`
-- `wearable_observations.csv`
-- `device_observations.csv`
-- `patient_context.csv`
-- `connectivity_events.csv`
-- `laboratory_results.csv`
+## Procesamiento y Análisis
 
----
+- Python
+- Pandas
+- Numpy
+- DuckDB (consultas SQL sobre los datos crudos en `scripts/process_data.py` y `src/preprocessing`)
 
-## Flujo del sistema
+## Backend
 
-```text
-RAW
-↓
-Validación y normalización
-↓
-Timeline temporal
-↓
-Baseline personal
-↓
-Ventanas temporales
-↓
-Detección de desviaciones
-↓
-Persistencia
-↓
-Contexto y calidad
-↓
-Risk Score
-↓
-Priorización
-↓
-Evidencia trazable
-↓
-signals.csv + evidence.csv
-```
+- Python
+- FastAPI
+- Uvicorn
+- Pydantic (v2, con soporte de email)
+- SQLAlchemy (usuarios/autenticación en SQLite)
+- python-jose (JWT)
+- Passlib (hash de contraseñas, `pbkdf2_sha256`)
+- pyarrow (lectura de los `.parquet` de condiciones/medicaciones)
 
----
+## Frontend
 
-## Baseline personal
+- TypeScript
+- Next.js 14 (App Router)
+- React 18
+- jose (verificación de JWT en middleware)
+- CSS plano con variables (sin librería de UI ni de gráficos)
 
-Para cada paciente se utilizan las primeras 24 horas de datos válidos como período inicial de calibración.
+## Persistencia / Resultados
 
-Se calcula para cada variable:
+- CSV (`results/signals.csv`, `results/evidence.csv`) como fuente de verdad de señales/evidencia
+- Parquet (`K3RNEL/healthsignal/data/processed/*.parquet`) para condiciones y administraciones de medicación
+- SQLite (usuarios de autenticación del backend)
 
-- media
-- mediana
-- desviación estándar
+## Herramientas de Desarrollo
 
-Variables utilizadas:
+- Git / GitHub
+- npm (gestor de paquetes frontend)
+- pip + entorno virtual `.venv` (backend)
+- ESLint/TypeScript compiler (`tsc --noEmit`, `next lint`) para verificación
 
-- HR
-- RR
-- SpO2
-- TEMP
-- SBP
-- DBP
+# 6. Instalación
 
----
+## Requisitos Previos
 
-## Detección
+- Python 3.12+
+- Node.js 20+ (con npm)
+- Git
 
-El sistema analiza ventanas temporales de 4 horas con decisiones cada 1 hora.
+## Instalacion
 
-Se calcula la desviación respecto del baseline personal mediante z-score.
+1. Clonar el repositorio
 
-Una ventana candidata requiere:
+`git clone https://github.com/K3RNEL-Organization/Hackathon-Internacional.git`
+`cd Hackathon-Internacional`
 
-- `|z-score| >= 2`
-- al menos 2 variables desviadas
+2. Backend (FastAPI)
 
-Para confirmar una señal se requieren al menos 2 ventanas consecutivas.
+`cd backend`
+`python -m venv .venv`
+`.venv\Scripts\Activate.ps1      # PowerShell`
+`# .venv\Scripts\activate.bat    # CMD`
+`pip install -r requirements.txt`
 
-Estos parámetros son decisiones del MVP y no representan umbrales clínicos oficiales.
+Levantar el servidor:
 
----
+`uvicorn app.main:app --reload --port 8000`
 
-## Risk Score
+Queda disponible en `http://localhost:8000`. Al arrancar, crea automáticamente una base SQLite local con dos usuarios de prueba (uno por rol).
 
-El risk score combina:
+3. Frontend (Next.js)
 
-- magnitud de la desviación
-- cantidad de variables afectadas
-- persistencia temporal
-- calidad del dispositivo
-- contexto de actividad
+`cd frontend`
+`copy .env.local.example .env.local    # Windows`
+`# cp .env.local.example .env.local    # Linux/Mac`
+`npm install`
+`npm run dev`
 
-El score se encuentra entre 0 y 1.
+Queda disponible en `http://localhost:3000`.
 
-Prioridades:
+4. Uso
 
-- LOW: `< 0.30`
-- MEDIUM: `0.30 - 0.49`
-- HIGH: `0.50 - 0.74`
-- CRITICAL: `>= 0.75`
-
-Estas categorías forman parte del modelo de priorización del MVP.
-
----
-
-## Temporalidad
-
-El pipeline respeta event time y availability time.
-
-Ejemplos:
-
-- Vital signs:
-  - event time = `timestamp`
-  - availability time = `timestamp`
-- Wearables:
-  - event time = `timestamp`
-  - availability time = `sync_datetime`
-- Laboratorios:
-  - event time = `sample_datetime`
-  - availability time = `result_datetime`
-
-Ninguna evidencia puede utilizarse si todavía no estaba disponible al momento de la decisión.
-
----
-
-## Contexto
-
-### Actividad wearable
-
-Permite contextualizar desviaciones asociadas a actividad física.
-
-### Patient context
-
-Incluye información temporal de sueño y recuperación.
-
-Se exige una superposición temporal mínima de 15 minutos con la ventana de evidencia.
-
-### Conectividad
-
-Permite identificar eventos:
-
-- DISCONNECTED
-- INTERMITTENT
-- DELAYED_SYNC
-
-Los problemas de conectividad se utilizan como evidencia de calidad y no como señales clínicas.
-
-### Laboratorios
-
-Los resultados disponibles durante la ventana se agregan como evidencia `SUPPORTING`.
-
-Los límites `reference_low` y `reference_high` se utilizan únicamente como contexto y no como thresholds automáticos de riesgo.
-
----
-
-## Resultados actuales
-
-El pipeline v0.3 procesa:
-
-- 1000 pacientes
-- 461 señales
-- 300 pacientes con al menos una señal
-- 16152 registros de evidencia
-
-Distribución de prioridades:
-
-- MEDIUM: 361
-- HIGH: 86
-- CRITICAL: 14
-
----
-
-## Archivos generados
-
-### `results/signals.csv`
-
-Una fila por señal detectada.
-
-Incluye:
-
-- `signal_id`
-- `patient_id`
-- `decision_datetime`
-- `risk_score`
-- `priority_level`
-- `confidence_score`
-- `evidence_start`
-- `evidence_end`
-- `explanation`
-- `model_version`
-
-### `results/evidence.csv`
-
-Contiene los registros que justifican o contextualizan cada señal.
-
-Roles:
-
-- `PRIMARY`
-- `SUPPORTING`
-- `CONTEXT`
-- `QUALITY`
-
----
-
-## Validaciones
-
-El pipeline comprueba:
-
-- `signal_id` duplicados
-- señales sin evidencia
-- evidencia disponible después de la decisión
-- risk scores fuera de rango
-
-Resultado actual:
-
-- 0 `signal_id` duplicados
-- 0 señales sin evidencia
-- 0 evidencias futuras
-- 0 risk scores inválidos
-
-El resultado también fue validado mediante el Submission Validator oficial de RISA con 0 warnings.
-
----
-
-## Auditorías realizadas
-
-Se realizaron auditorías específicas sobre:
-
-- señales CRITICAL
-- contexto temporal
-- conectividad
-- laboratorios
-
-La auditoría de laboratorios verificó:
-
-- `result_datetime <= decision_datetime`
-- `available_datetime = result_datetime`
-- `event_datetime = sample_datetime`
-- correspondencia con registros originales
-
-Resultado:
-
-```text
-AUDITORIA LABS: PASS
-```
-
----
-
-## Integración con dashboard
-
-El dashboard puede consumir directamente:
-
-```text
-results/signals.csv
-results/evidence.csv
-```
-
-Vista sugerida:
-
-```text
-Resumen de señales
-↓
-Filtros por prioridad y paciente
-↓
-Tabla ordenada por risk_score
-↓
-Detalle de señal
-↓
-Explicación + evidencia asociada
-```
-
----
-
-## Versión
-
-Modelo actual:
-
-```text
-risa_mvp_v0.3
-```
+Con ambos servidores corriendo, abrir `http://localhost:3000` en el navegador e iniciar sesión con alguno de los usuarios de prueba definidos en `backend/app/seed.py`.
