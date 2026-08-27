@@ -8,6 +8,7 @@ import { StatCard } from "@/components/StatCard";
 import { PatientSignalCard } from "@/components/PatientSignalCard";
 import { EmptyState } from "@/components/EmptyState";
 import { PriorityFilterBar, PriorityFilterValue } from "@/components/PriorityFilterBar";
+import { PriorityDistributionBar } from "@/components/PriorityDistributionBar";
 
 type LoadStatus = "loading" | "error" | "ready";
 
@@ -93,7 +94,7 @@ export function DashboardView() {
           onClick={() => load(filter, "refresh")}
           disabled={isRefreshing || status === "loading"}
         >
-          {isRefreshing ? "Actualizando..." : "Actualizar"}
+          {isRefreshing ? "Actualizando..." : "↻ Actualizar"}
         </button>
       </div>
 
@@ -115,25 +116,25 @@ export function DashboardView() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
               gap: "var(--space-4)",
-              marginBottom: "var(--space-6)",
+              marginBottom: "var(--space-4)",
             }}
           >
-            <StatCard label="Pacientes con señales" value={summary.patients_monitored} />
-            <StatCard label="Señales activas" value={summary.active_signals} />
-            <StatCard
-              label="Prioridad crítica"
-              value={summary.priority_critical}
-              accentColor="var(--color-critical)"
+            <StatCard label="Pacientes con señales" value={summary.patients_monitored} icon="◉" />
+            <StatCard label="Total de señales" value={summary.active_signals} icon="⌁" />
+          </div>
+
+          <div className="card" style={{ marginBottom: "var(--space-6)" }}>
+            <h2 style={{ marginBottom: "var(--space-5)" }}>Distribución de prioridades</h2>
+            <PriorityDistributionBar
+              counts={{
+                critical: summary.priority_critical,
+                high: summary.priority_high,
+                medium: summary.priority_medium,
+                low: summary.priority_low,
+              }}
             />
-            <StatCard label="Prioridad alta" value={summary.priority_high} accentColor="var(--color-high)" />
-            <StatCard
-              label="Prioridad media"
-              value={summary.priority_medium}
-              accentColor="var(--color-medium)"
-            />
-            <StatCard label="Prioridad baja" value={summary.priority_low} accentColor="var(--color-low)" />
           </div>
 
           {summary.active_signals === 0 ? (
@@ -145,13 +146,7 @@ export function DashboardView() {
               {patients.length === 0 ? (
                 <EmptyState message="No hay pacientes disponibles actualmente." />
               ) : (
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-                    gap: "var(--space-4)",
-                  }}
-                >
+                <div className="card-grid">
                   {patients.map((signal) => (
                     <PatientSignalCard
                       key={signal.signal_id}
@@ -175,25 +170,20 @@ function LoadingState() {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
           gap: "var(--space-4)",
-          marginBottom: "var(--space-6)",
+          marginBottom: "var(--space-4)",
         }}
       >
-        {Array.from({ length: 5 }).map((_, index) => (
+        {Array.from({ length: 2 }).map((_, index) => (
           <div key={index} className="skeleton" style={{ height: 84, borderRadius: "var(--radius-md)" }} />
         ))}
       </div>
+      <div className="skeleton" style={{ height: 96, borderRadius: "var(--radius-md)", marginBottom: "var(--space-6)" }} />
       <p className="caption" style={{ marginBottom: "var(--space-4)" }}>
         Cargando información...
       </p>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-          gap: "var(--space-4)",
-        }}
-      >
+      <div className="card-grid">
         {Array.from({ length: 6 }).map((_, index) => (
           <div key={index} className="skeleton" style={{ height: 150, borderRadius: "var(--radius-md)" }} />
         ))}

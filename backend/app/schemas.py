@@ -44,12 +44,20 @@ class DashboardSummary(BaseModel):
     last_updated: datetime | None
 
 
+class VariableDeviationOut(BaseModel):
+    variable_code: str
+    direction: str
+    z_score: float
+
+
 class PatientSignalOut(BaseModel):
     patient_id: str
     signal_id: str
     priority_level: SignalPriority
     risk_score: float | None
     short_description: str
+    pattern_summary: str
+    variable_deviations: list[VariableDeviationOut]
     generated_at: datetime
 
 
@@ -93,12 +101,6 @@ class PatientDetailOut(BaseModel):
     timeline: list[TimelineEventOut]
 
 
-class VariableDeviationOut(BaseModel):
-    variable_code: str
-    direction: str
-    z_score: float
-
-
 class EvidenceRecordOut(BaseModel):
     source_file: str
     variable_code: str
@@ -123,4 +125,9 @@ class SignalDetailOut(BaseModel):
     evidence_window_start: datetime | None
     evidence_window_end: datetime | None
     variable_deviations: list[VariableDeviationOut]
+    pattern_summary: str
+    persistence_windows: int | None
+    device_quality_pct: float | None
+    activity_note: str | None
+    context_note: str | None
     evidence: list[EvidenceRecordOut]

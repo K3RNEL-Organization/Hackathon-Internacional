@@ -6,7 +6,16 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from ..data import get_evidence_df, get_signals_df
 from ..models import User, UserRole
 from ..schemas import EvidenceRecordOut, PatientSignalOut, SignalDetailOut
-from ..signal_utils import PRIORITY_ORDER, parse_variable_deviations, to_patient_signal_out
+from ..signal_utils import (
+    PRIORITY_ORDER,
+    parse_activity_note,
+    parse_context_note,
+    parse_device_quality_pct,
+    parse_pattern_summary,
+    parse_persistence_windows,
+    parse_variable_deviations,
+    to_patient_signal_out,
+)
 from .auth import require_role
 
 router = APIRouter(prefix="/signals", tags=["signals"])
@@ -87,5 +96,10 @@ def get_signal_detail(
         evidence_window_start=signal["evidence_start"] if pd.notna(signal["evidence_start"]) else None,
         evidence_window_end=signal["evidence_end"] if pd.notna(signal["evidence_end"]) else None,
         variable_deviations=parse_variable_deviations(signal["explanation"]),
+        pattern_summary=parse_pattern_summary(signal["explanation"]),
+        persistence_windows=parse_persistence_windows(signal["explanation"]),
+        device_quality_pct=parse_device_quality_pct(signal["explanation"]),
+        activity_note=parse_activity_note(signal["explanation"]),
+        context_note=parse_context_note(signal["explanation"]),
         evidence=evidence_out,
     )

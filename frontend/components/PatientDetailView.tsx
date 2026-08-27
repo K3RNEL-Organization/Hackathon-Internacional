@@ -2,11 +2,17 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { PatientDetail, PRIORITY_LABEL, TimelineEventType } from "@/lib/types";
+import {
+  PatientDetail,
+  TimelineEventType,
+  conditionCategoryLabel,
+  conditionStatusLabel,
+} from "@/lib/types";
 import { formatDateTime } from "@/lib/format";
 import { PriorityBadge } from "@/components/PriorityBadge";
 import { PatientSignalCard } from "@/components/PatientSignalCard";
 import { EmptyState } from "@/components/EmptyState";
+import { Breadcrumb } from "@/components/Breadcrumb";
 
 type LoadStatus = "loading" | "error" | "not_found" | "ready";
 
@@ -25,7 +31,7 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: "vitales", label: "Signos vitales" },
   { key: "laboratorios", label: "Laboratorios" },
   { key: "wearables", label: "Wearables" },
-  { key: "timeline", label: "Timeline" },
+  { key: "timeline", label: "Línea de tiempo" },
   { key: "senales", label: "Señales asociadas" },
 ];
 
@@ -99,6 +105,14 @@ export function PatientDetailView({ patientId }: { patientId: string }) {
 
   return (
     <div>
+      <Breadcrumb
+        items={[
+          { label: "Dashboard", href: "/dashboard" },
+          { label: "Pacientes", href: "/pacientes" },
+          { label: patient.patient_id },
+        ]}
+      />
+
       <PatientHeader patient={patient} />
 
       <div
@@ -152,7 +166,7 @@ function PatientHeader({ patient }: { patient: PatientDetail }) {
         }}
       >
         <div>
-          <p className="caption">Patient ID</p>
+          <p className="caption">ID de paciente</p>
           <h1 style={{ fontSize: 22 }}>{patient.patient_id}</h1>
         </div>
 
@@ -161,7 +175,7 @@ function PatientHeader({ patient }: { patient: PatientDetail }) {
             <PriorityBadge priority={patient.current_priority} />
             {patient.current_risk_score !== null && (
               <p className="caption" style={{ marginTop: "var(--space-1)" }}>
-                Score: {patient.current_risk_score.toFixed(2)}
+                Score de riesgo: {patient.current_risk_score.toFixed(2)}
               </p>
             )}
           </div>
@@ -183,18 +197,33 @@ function PatientHeader({ patient }: { patient: PatientDetail }) {
           value={patient.last_signal_at ? formatDateTime(patient.last_signal_at) : "No disponible"}
         />
         <InfoField
-          label="Última actualización"
+          label="Último dato disponible"
           value={patient.last_updated ? formatDateTime(patient.last_updated) : "No disponible"}
         />
-        <InfoField
-          label="Encounter actual"
-          value={
-            patient.encounter
-              ? `${patient.encounter.encounter_id} · desde ${formatDateTime(patient.encounter.start)}`
-              : "No disponible"
-          }
-        />
+        <EncounterField encounter={patient.encounter} />
       </div>
+    </div>
+  );
+}
+
+function EncounterField({ encounter }: { encounter: PatientDetail["encounter"] }) {
+  if (!encounter) {
+    return <InfoField label="Episodio asociado" value="No disponible" />;
+  }
+
+  const isFinished = Boolean(encounter.end);
+
+  return (
+    <div>
+      <p className="caption">Episodio asociado</p>
+      <p style={{ fontWeight: 600 }}>{encounter.encounter_id}</p>
+      <p className="caption" style={{ marginTop: "var(--space-1)" }}>
+        {formatDateTime(encounter.start)}
+        {encounter.end ? ` → ${formatDateTime(encounter.end)}` : ""}
+      </p>
+      <p className="caption" style={{ marginTop: "var(--space-1)" }}>
+        Estado: {isFinished ? "Finalizado" : "En curso"}
+      </p>
     </div>
   );
 }
@@ -215,23 +244,26 @@ function ResumenTab({ patient }: { patient: PatientDetail }) {
       {patient.conditions.length === 0 ? (
         <p className="caption">Información no disponible.</p>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
           {patient.conditions.map((condition, index) => (
             <div
               key={index}
               style={{
-                display: "flex",
-                justifyContent: "space-between",
-                flexWrap: "wrap",
-                gap: "var(--space-2)",
-                paddingBottom: "var(--space-3)",
+                paddingBottom: "var(--space-4)",
                 borderBottom:
                   index < patient.conditions.length - 1 ? "1px solid var(--color-border)" : "none",
               }}
             >
-              <span style={{ fontWeight: 600 }}>{condition.category.replaceAll("_", " ")}</span>
-              <span className="caption">{condition.status}</span>
-              <span className="caption">{formatDateTime(condition.recorded_at)}</span>
+              <p style={{ fontWeight: 600 }}>{conditionCategoryLabel(condition.category)}</p>
+              <p className="caption" style={{ marginTop: "var(--space-1)" }}>
+                Estado: {conditionStatusLabel(condition.status)}
+              </p>
+              <p className="caption" style={{ marginTop: "var(--space-1)" }}>
+                Código: {condition.category}
+              </p>
+              <p className="caption" style={{ marginTop: "var(--space-1)" }}>
+                Registrado en RISA: {formatDateTime(condition.recorded_at)}
+              </p>
             </div>
           ))}
         </div>
@@ -240,6 +272,13 @@ function ResumenTab({ patient }: { patient: PatientDetail }) {
   );
 }
 
+const PRIORITY_DOT_COLOR: Record<string, string> = {
+  LOW: "var(--color-low)",
+  MEDIUM: "var(--color-medium)",
+  HIGH: "var(--color-high)",
+  CRITICAL: "var(--color-critical)",
+};
+
 function TimelineTab({ patient }: { patient: PatientDetail }) {
   if (patient.timeline.length === 0) {
     return <EmptyState message="No hay eventos registrados para este paciente." />;
@@ -247,34 +286,47 @@ function TimelineTab({ patient }: { patient: PatientDetail }) {
 
   return (
     <div className="card">
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
-        {patient.timeline.map((event, index) => (
-          <div
-            key={index}
-            style={{
-              display: "flex",
-              gap: "var(--space-3)",
-              alignItems: "flex-start",
-              paddingBottom: "var(--space-4)",
-              borderBottom:
-                index < patient.timeline.length - 1 ? "1px solid var(--color-border)" : "none",
-            }}
-          >
-            <span
-              className="caption"
-              style={{ minWidth: 150, fontWeight: 600, color: "var(--color-text-primary)" }}
-            >
-              {formatDateTime(event.timestamp)}
-            </span>
-            <div>
-              <p style={{ fontWeight: 600 }}>{TIMELINE_LABEL[event.type]}</p>
-              <p className="caption">
-                {event.label}
-                {event.priority_level ? ` · ${PRIORITY_LABEL[event.priority_level]}` : ""}
-              </p>
+      <div className="vertical-timeline">
+        {patient.timeline.map((event, index) => {
+          const isLast = index === patient.timeline.length - 1;
+          const isSignal = event.type === "SIGNAL_DETECTED" && event.priority_level;
+          const dotColor = isSignal ? PRIORITY_DOT_COLOR[event.priority_level as string] : "var(--color-text-muted)";
+
+          return (
+            <div key={index} className="vertical-timeline__item">
+              <div className="vertical-timeline__rail">
+                <span
+                  className={`vertical-timeline__dot ${isSignal ? "vertical-timeline__dot--priority" : ""}`}
+                  style={{
+                    borderColor: dotColor,
+                    backgroundColor: isSignal ? dotColor : "var(--color-surface)",
+                  }}
+                  aria-hidden="true"
+                />
+                {!isLast && <span className="vertical-timeline__line" aria-hidden="true" />}
+              </div>
+              <div className="vertical-timeline__content">
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "var(--space-2)",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <p style={{ fontWeight: 600 }}>{TIMELINE_LABEL[event.type]}</p>
+                  {event.priority_level && <PriorityBadge priority={event.priority_level} />}
+                </div>
+                <p className="caption" style={{ marginTop: "var(--space-1)" }}>
+                  {formatDateTime(event.timestamp)}
+                </p>
+                <p className="caption" style={{ marginTop: "var(--space-1)" }}>
+                  {event.label}
+                </p>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -288,13 +340,7 @@ function SenalesTab({ patient }: { patient: PatientDetail }) {
   }
 
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-        gap: "var(--space-4)",
-      }}
-    >
+    <div className="card-grid">
       {patient.signals.map((signal) => (
         <PatientSignalCard
           key={signal.signal_id}
@@ -313,13 +359,7 @@ function LoadingState() {
       <p className="caption" style={{ margin: "var(--space-4) 0" }}>
         Cargando información...
       </p>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-          gap: "var(--space-4)",
-        }}
-      >
+      <div className="card-grid">
         {Array.from({ length: 3 }).map((_, index) => (
           <div key={index} className="skeleton" style={{ height: 130, borderRadius: "var(--radius-md)" }} />
         ))}

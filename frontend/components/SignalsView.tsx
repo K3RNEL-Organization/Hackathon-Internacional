@@ -6,6 +6,7 @@ import { PatientSignal } from "@/lib/types";
 import { PatientSignalCard } from "@/components/PatientSignalCard";
 import { EmptyState } from "@/components/EmptyState";
 import { PriorityFilterBar, PriorityFilterValue } from "@/components/PriorityFilterBar";
+import { Breadcrumb } from "@/components/Breadcrumb";
 
 type LoadStatus = "loading" | "error" | "ready";
 
@@ -51,6 +52,8 @@ export function SignalsView() {
 
   return (
     <div>
+      <Breadcrumb items={[{ label: "Dashboard", href: "/dashboard" }, { label: "Señales" }]} />
+
       <div style={{ marginBottom: "var(--space-6)" }}>
         <h1>Señales RISA</h1>
         <p className="caption" style={{ marginTop: "var(--space-1)" }}>
@@ -81,13 +84,7 @@ export function SignalsView() {
             }
           />
         ) : (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-              gap: "var(--space-4)",
-            }}
-          >
+          <div className="card-grid">
             {signals.map((signal) => (
               <PatientSignalCard key={signal.signal_id} signal={signal} onSelect={handleSelectSignal} />
             ))}
@@ -99,13 +96,7 @@ export function SignalsView() {
 
 function LoadingState() {
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-        gap: "var(--space-4)",
-      }}
-    >
+    <div className="card-grid">
       {Array.from({ length: 6 }).map((_, index) => (
         <div key={index} className="skeleton" style={{ height: 150, borderRadius: "var(--radius-md)" }} />
       ))}

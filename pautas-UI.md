@@ -226,6 +226,8 @@ Los niveles deben utilizar una escala visual consistente:
 
 ## 6. Paleta visual
 
+> Actualizado: paleta de marca reemplazada por la variante teal/oscura (referencia: `index.html` / `styles.css` provistos). Los colores de prioridad NO cambian.
+
 ### 6.1 Colores funcionales
 
 ```text
@@ -238,21 +240,28 @@ CRITICAL  #EF4444
 ### 6.2 Colores de interfaz
 
 ```text
-Background       #F8FAFC
-Surface          #FFFFFF
-Border           #E2E8F0
-Text Primary     #0F172A
-Text Secondary   #64748B
-Text Muted       #94A3B8
+Background (canvas)   #F5F8FB
+Surface                #FFFFFF
+Border (line)          #E2E8F0
+Text Primary (ink)     #0F172A
+Text Secondary (muted) #64748B
+Text Muted (soft)      #94A3B8
 ```
 
-### 6.3 Color de acción
+### 6.3 Color de marca / acción
 
-El color principal de TriageMed debe utilizarse para:
+```text
+Brand           #155E75
+Brand Dark      #0E4658
+Brand Soft      #E6F5F7
+Sidebar bg      #073B4C   (fondo del sidebar, oscuro, distinto de Brand)
+```
+
+El color de marca (`Brand`) debe utilizarse para:
 
 * Botones principales.
 * Enlaces.
-* Elementos activos.
+* Elementos activos (item de navegación activo, filtro activo).
 * Selecciones.
 * Indicadores interactivos.
 * Estados de foco.
@@ -263,36 +272,39 @@ No utilizar los colores de prioridad como color principal de botones o navegaci�
 
 ## 7. Tipografía
 
-Utilizar una tipografía sans-serif moderna y legible.
+> Actualizado: dos familias, siguiendo `styles.css`.
 
-Opciones recomendadas:
+* **Cuerpo / UI:** DM Sans.
+* **Títulos / display (H1, H2, H3, marca, valores numéricos grandes):** Space Grotesk.
 
-* Inter.
-* Roboto.
-* `system-ui`.
+Ambas se cargan como Google Fonts.
 
 ### Jerarquía tipográfica
 
 ```text
-H1       Título principal
-H2       Título de sección
-H3       Título de tarjeta o subsección
-Body     Información general
-Caption  Metadata y datos secundarios
+H1       Título principal          Space Grotesk 600
+H2       Título de sección         Space Grotesk 600
+H3       Título de tarjeta         Space Grotesk 600
+Body     Información general       DM Sans 400/500
+Caption  Metadata y datos secundarios  DM Sans 400
 ```
 
 ### CSS base
 
 ```css
 body {
-    font-family: Inter, system-ui, sans-serif;
+    font-family: "DM Sans", system-ui, sans-serif;
     color: #0F172A;
     font-size: 14px;
 }
 
+h1, h2, h3, .brand strong, .kpi-card > strong {
+    font-family: "Space Grotesk", system-ui, sans-serif;
+}
+
 h1 {
     font-size: 28px;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 h2 {
@@ -738,21 +750,31 @@ Una prioridad crítica debe destacarse mediante jerarquía visual, contraste y u
 
 La navegación debe ser simple y predecible.
 
+> Actualizado: la navegación principal vive en un **sidebar fijo** a la izquierda (desktop), no en un header horizontal. En mobile el sidebar se oculta y se abre con un botón de menú (☰) en el topbar.
+
 ### Estructura recomendada
 
 ```text
-Dashboard
-Casos / Alertas
-Indicadores
+Sidebar
+├── Marca (logo)
+├── Dashboard
+├── Pacientes
+├── Señales
+└── Footer: estado del sistema + perfil del usuario / cerrar sesión
+
+Topbar (por página)
+├── Botón de menú (solo mobile)
+├── Breadcrumb / título de sección
+└── Acciones contextuales (ej. Actualizar)
 ```
 
 ### Reglas
 
-* Mantener visible la sección activa.
+* Mantener visible la sección activa (resaltada en el sidebar).
 * Utilizar nombres claros.
 * Evitar menús innecesariamente profundos.
 * Permitir volver fácilmente desde el detalle a la lista.
-* Mantener la navegación consistente en desktop y mobile.
+* Mantener la navegación consistente en desktop y mobile (sidebar off-canvas en mobile, no un menú de tres puntos independiente).
 
 ---
 
@@ -805,7 +827,7 @@ Centralizar los valores visuales en variables CSS:
 
 ```css
 :root {
-    --color-background: #F8FAFC;
+    --color-background: #F5F8FB;
     --color-surface: #FFFFFF;
     --color-border: #E2E8F0;
 
@@ -817,6 +839,11 @@ Centralizar los valores visuales en variables CSS:
     --color-medium: #EAB308;
     --color-high: #F97316;
     --color-critical: #EF4444;
+
+    --color-brand: #155E75;
+    --color-brand-dark: #0E4658;
+    --color-brand-soft: #E6F5F7;
+    --color-sidebar-bg: #073B4C;
 
     --radius-sm: 8px;
     --radius-md: 12px;
@@ -830,6 +857,20 @@ Centralizar los valores visuales en variables CSS:
     --space-7: 48px;
 }
 ```
+
+### 22.1 Componentes nuevos (referencia visual)
+
+Agregados a partir del mockup `index.html` / `styles.css` (mismos principios de la sección 9, adaptados):
+
+* **KpiCard**: variante de `StatCard` con un ícono en la esquina superior derecha (color según el tipo de métrica, no según prioridad). Solo debe usarse para valores reales provistos por el backend — no agregar métricas ni variaciones de tendencia (`+8.2%`, etc.) que no existan en los datos.
+* **PriorityDistributionBar**: barra horizontal segmentada + leyenda, construida a partir de los conteos reales de prioridad (igual fuente de datos que las `KpiCard` de prioridad del Dashboard).
+* **CaseCard**: evolución de `CaseCard`/`PatientSignalCard` con borde izquierdo de 3px del color de la prioridad, en vez de solo el punto indicador.
+* **Sidebar / Topbar**: reemplazan al `Header` horizontal. Ver sección 20.
+
+### Reglas
+
+* No inventar íconos o métricas que sugieran datos que el backend no provee.
+* Mantener el mismo componente `PriorityBadge` (punto + texto) dentro de las tarjetas nuevas.
 
 ---
 

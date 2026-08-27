@@ -1,3 +1,9 @@
+export interface CurrentUser {
+  email: string;
+  name: string;
+  role: "PROFESIONAL_SALUD" | "ADMINISTRADOR";
+}
+
 export type Priority = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
 export const PRIORITY_LABEL: Record<Priority, string> = {
@@ -6,6 +12,37 @@ export const PRIORITY_LABEL: Record<Priority, string> = {
   HIGH: "Alta",
   CRITICAL: "Crítica",
 };
+
+export type DeviationDirection = "INCREASE" | "DECREASE";
+
+export interface VariableDeviation {
+  variable_code: string;
+  direction: DeviationDirection;
+  z_score: number;
+}
+
+/** Display-only translations. Internal codes (HR, RR, SpO2, TEMP, ...) are never changed. */
+export const VARIABLE_LABEL: Record<string, string> = {
+  HR: "FC",
+  RR: "FR",
+  SpO2: "SpO₂",
+  TEMP: "Temperatura",
+  SBP: "PAS",
+  DBP: "PAD",
+  ACTIVITY_LEVEL: "Nivel de actividad",
+  SIGNAL_QUALITY_INDEX: "Calidad de señal",
+  SLEEP_STATE: "Estado de sueño",
+  RECOVERY_PHASE: "Fase de recuperación",
+  CONNECTIVITY: "Conectividad",
+  LAB_A: "Laboratorio A",
+  LAB_B: "Laboratorio B",
+  LAB_C: "Laboratorio C",
+  LAB_D: "Laboratorio D",
+};
+
+export function variableLabel(code: string): string {
+  return VARIABLE_LABEL[code] ?? code;
+}
 
 export interface DashboardSummary {
   patients_monitored: number;
@@ -23,6 +60,8 @@ export interface PatientSignal {
   priority_level: Priority;
   risk_score: number | null;
   short_description: string;
+  pattern_summary: string;
+  variable_deviations: VariableDeviation[];
   generated_at: string;
 }
 
@@ -31,6 +70,30 @@ export interface Condition {
   status: string;
   onset_date: string | null;
   recorded_at: string;
+}
+
+/** Display-only translations. Internal codes (RENAL_HISTORY, ...) are never changed. */
+export const CONDITION_CATEGORY_LABEL: Record<string, string> = {
+  RENAL_HISTORY: "Antecedente renal",
+  CARDIOVASCULAR_HISTORY: "Antecedente cardiovascular",
+  RESPIRATORY_HISTORY: "Antecedente respiratorio",
+  METABOLIC_HISTORY: "Antecedente metabólico",
+  NO_MAJOR_RECORDED_HISTORY: "Sin antecedentes relevantes registrados",
+};
+
+export const CONDITION_STATUS_LABEL: Record<string, string> = {
+  ACTIVE: "Activo",
+  INACTIVE: "Inactivo",
+  RESOLVED: "Resuelto",
+  RECORDED: "Registrado",
+};
+
+export function conditionCategoryLabel(code: string): string {
+  return CONDITION_CATEGORY_LABEL[code] ?? code.replaceAll("_", " ");
+}
+
+export function conditionStatusLabel(code: string): string {
+  return CONDITION_STATUS_LABEL[code] ?? code;
 }
 
 export interface Encounter {
@@ -65,14 +128,6 @@ export interface PatientDetail {
   timeline: TimelineEvent[];
 }
 
-export type DeviationDirection = "INCREASE" | "DECREASE";
-
-export interface VariableDeviation {
-  variable_code: string;
-  direction: DeviationDirection;
-  z_score: number;
-}
-
 export interface EvidenceRecord {
   source_file: string;
   variable_code: string;
@@ -104,5 +159,10 @@ export interface SignalDetail {
   evidence_window_start: string | null;
   evidence_window_end: string | null;
   variable_deviations: VariableDeviation[];
+  pattern_summary: string;
+  persistence_windows: number | null;
+  device_quality_pct: number | null;
+  activity_note: string | null;
+  context_note: string | null;
   evidence: EvidenceRecord[];
 }

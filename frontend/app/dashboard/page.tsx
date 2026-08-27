@@ -1,13 +1,10 @@
-import { AppHeader } from "@/components/AppHeader";
+import { AppShell } from "@/components/AppShell";
 import { DashboardView } from "@/components/DashboardView";
 
 export default function DashboardPage() {
   return (
-    <>
-      <AppHeader />
-      <main style={{ padding: "var(--space-6)", maxWidth: 1200, margin: "0 auto" }}>
-        <DashboardView />
-      </main>
-    </>
+    <AppShell>
+      <DashboardView />
+    </AppShell>
   );
 }

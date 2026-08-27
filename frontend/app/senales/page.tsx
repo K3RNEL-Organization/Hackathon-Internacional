@@ -1,13 +1,10 @@
-import { AppHeader } from "@/components/AppHeader";
+import { AppShell } from "@/components/AppShell";
 import { SignalsView } from "@/components/SignalsView";
 
 export default function SenalesPage() {
   return (
-    <>
-      <AppHeader />
-      <main style={{ padding: "var(--space-6)", maxWidth: 1200, margin: "0 auto" }}>
-        <SignalsView />
-      </main>
-    </>
+    <AppShell>
+      <SignalsView />
+    </AppShell>
   );
 }

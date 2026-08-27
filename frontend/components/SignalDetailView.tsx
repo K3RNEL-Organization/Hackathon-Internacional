@@ -3,11 +3,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { SignalDetail, SOURCE_FILE_LABEL } from "@/lib/types";
-import { formatDateTime } from "@/lib/format";
+import { SignalDetail, SOURCE_FILE_LABEL, variableLabel } from "@/lib/types";
+import { formatDateTime, formatPercent, formatSigma } from "@/lib/format";
 import { PriorityBadge } from "@/components/PriorityBadge";
 import { EmptyState } from "@/components/EmptyState";
 import { VariableTimeline } from "@/components/VariableTimeline";
+import { Breadcrumb } from "@/components/Breadcrumb";
+import { RoleBadge } from "@/components/RoleBadge";
 
 type LoadStatus = "loading" | "error" | "not_found" | "ready";
 
@@ -73,6 +75,15 @@ export function SignalDetailView({ signalId }: { signalId: string }) {
 
   return (
     <div>
+      <Breadcrumb
+        items={[
+          { label: "Dashboard", href: "/dashboard" },
+          { label: "Señales", href: "/senales" },
+          { label: signal.patient_id, href: `/pacientes/${signal.patient_id}` },
+          { label: signal.signal_id },
+        ]}
+      />
+
       <div
         style={{
           display: "flex",
@@ -81,6 +92,9 @@ export function SignalDetailView({ signalId }: { signalId: string }) {
           flexWrap: "wrap",
         }}
       >
+        <button type="button" className="btn btn-secondary" onClick={() => router.back()}>
+          ← Volver
+        </button>
         <Link href={`/pacientes/${signal.patient_id}`} className="btn btn-secondary">
           Volver al paciente
         </Link>
@@ -92,34 +106,62 @@ export function SignalDetailView({ signalId }: { signalId: string }) {
       <SignalHeader signal={signal} />
 
       <Section title="Qué fue detectado">
-        <p style={{ color: "var(--color-text-secondary)" }}>{signal.explanation}</p>
-      </Section>
+        <p style={{ color: "var(--color-text-secondary)", marginBottom: "var(--space-5)" }}>
+          <strong style={{ color: "var(--color-text-primary)" }}>Patrón detectado: </strong>
+          {signal.pattern_summary}
+        </p>
 
-      <Section title="Variables involucradas">
         {signal.variable_deviations.length === 0 ? (
           <p className="caption">No hay variables cuantificadas disponibles para esta señal.</p>
         ) : (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-3)" }}>
-            {signal.variable_deviations.map((deviation) => (
-              <div
-                key={deviation.variable_code}
-                className="card"
-                style={{ padding: "var(--space-3) var(--space-4)", minWidth: 140 }}
-              >
-                <p style={{ fontWeight: 700 }}>{deviation.variable_code}</p>
-                <p
-                  className="caption"
-                  style={{
-                    color:
-                      deviation.direction === "INCREASE" ? "var(--color-high)" : "var(--color-action)",
-                    fontWeight: 600,
-                  }}
-                >
-                  {deviation.direction === "INCREASE" ? "▲ Aumento" : "▼ Descenso"} ·{" "}
-                  {deviation.z_score.toFixed(2)} z
-                </p>
-              </div>
-            ))}
+          <div style={{ overflowX: "auto", marginBottom: "var(--space-5)" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+              <thead>
+                <tr style={{ textAlign: "left", borderBottom: "1px solid var(--color-border)" }}>
+                  <th style={thStyle}>Variable</th>
+                  <th style={thStyle}>Comportamiento</th>
+                  <th style={thStyle}>Desviación</th>
+                </tr>
+              </thead>
+              <tbody>
+                {signal.variable_deviations.map((deviation) => (
+                  <tr key={deviation.variable_code} style={{ borderBottom: "1px solid var(--color-border)" }}>
+                    <td style={{ ...tdStyle, fontWeight: 600 }}>{variableLabel(deviation.variable_code)}</td>
+                    <td
+                      style={{
+                        ...tdStyle,
+                        color:
+                          deviation.direction === "INCREASE" ? "var(--color-high)" : "var(--color-action)",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {deviation.direction === "INCREASE" ? "↑ Aumento" : "↓ Descenso"}
+                    </td>
+                    <td style={tdStyle}>{formatSigma(deviation.z_score)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {(signal.persistence_windows !== null ||
+          signal.device_quality_pct !== null ||
+          signal.activity_note ||
+          signal.context_note) && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
+            {signal.persistence_windows !== null && (
+              <p className="caption">
+                Persistencia: {signal.persistence_windows} ventana
+                {signal.persistence_windows === 1 ? "" : "s"} consecutiva
+                {signal.persistence_windows === 1 ? "" : "s"}
+              </p>
+            )}
+            {signal.device_quality_pct !== null && (
+              <p className="caption">Calidad de señal: {signal.device_quality_pct.toFixed(0)}%</p>
+            )}
+            {signal.activity_note && <p className="caption">Contexto de actividad: {signal.activity_note}</p>}
+            {signal.context_note && <p className="caption">{signal.context_note}</p>}
           </div>
         )}
       </Section>
@@ -129,6 +171,7 @@ export function SignalDetailView({ signalId }: { signalId: string }) {
           evidence={signal.evidence}
           windowStart={signal.evidence_window_start}
           windowEnd={signal.evidence_window_end}
+          decisionAt={signal.generated_at}
         />
       </Section>
 
@@ -146,15 +189,20 @@ export function SignalDetailView({ signalId }: { signalId: string }) {
             value={signal.risk_score !== null ? signal.risk_score.toFixed(2) : "No disponible"}
           />
           <InfoField
-            label="Confianza del modelo"
-            value={signal.confidence_score !== null ? signal.confidence_score.toFixed(2) : "No disponible"}
+            label="Confianza de la evidencia"
+            value={signal.confidence_score !== null ? formatPercent(signal.confidence_score) : "No disponible"}
           />
         </div>
       </Section>
 
       <Section title="Evidencia y trazabilidad">
-        <p className="caption" style={{ marginBottom: "var(--space-4)" }}>
+        <p className="caption" style={{ marginBottom: "var(--space-2)" }}>
           Modelo: {signal.model_version}
+        </p>
+        <p className="caption" style={{ marginBottom: "var(--space-4)" }}>
+          Todas las evidencias listadas estaban disponibles al momento de la decisión (
+          {formatDateTime(signal.generated_at)}) — regla temporal de RISA: momento disponible ≤ momento
+          de decisión.
         </p>
         {signal.evidence.length === 0 ? (
           <p className="caption">No hay evidencia disponible para esta señal.</p>
@@ -165,6 +213,7 @@ export function SignalDetailView({ signalId }: { signalId: string }) {
                 <tr style={{ textAlign: "left", borderBottom: "1px solid var(--color-border)" }}>
                   <th style={thStyle}>Variable</th>
                   <th style={thStyle}>Fuente</th>
+                  <th style={thStyle}>ID de registro</th>
                   <th style={thStyle}>Momento del evento</th>
                   <th style={thStyle}>Disponible desde</th>
                   <th style={thStyle}>Rol</th>
@@ -172,16 +221,43 @@ export function SignalDetailView({ signalId }: { signalId: string }) {
                 </tr>
               </thead>
               <tbody>
-                {signal.evidence.map((record, index) => (
-                  <tr key={index} style={{ borderBottom: "1px solid var(--color-border)" }}>
-                    <td style={tdStyle}>{record.variable_code}</td>
-                    <td style={tdStyle}>{SOURCE_FILE_LABEL[record.source_file] ?? record.source_file}</td>
-                    <td style={tdStyle}>{formatDateTime(record.event_datetime)}</td>
-                    <td style={tdStyle}>{formatDateTime(record.available_datetime)}</td>
-                    <td style={tdStyle}>{record.evidence_role}</td>
-                    <td style={tdStyle}>{record.contribution.toFixed(2)}</td>
-                  </tr>
-                ))}
+                {signal.evidence.map((record, index) => {
+                  const isNonScoring =
+                    record.contribution === 0 &&
+                    (record.evidence_role === "CONTEXT" || record.evidence_role === "QUALITY");
+                  return (
+                    <tr key={index} style={{ borderBottom: "1px solid var(--color-border)" }}>
+                      <td style={tdStyle}>
+                        {variableLabel(record.variable_code)}{" "}
+                        <span className="caption">({record.variable_code})</span>
+                      </td>
+                      <td style={tdStyle}>
+                        {SOURCE_FILE_LABEL[record.source_file] ?? record.source_file}{" "}
+                        <span className="caption">({record.source_file})</span>
+                      </td>
+                      <td style={tdStyle}>
+                        <span className="caption">{record.record_id}</span>
+                      </td>
+                      <td style={tdStyle}>{formatDateTime(record.event_datetime)}</td>
+                      <td style={tdStyle}>{formatDateTime(record.available_datetime)}</td>
+                      <td style={tdStyle}>
+                        <RoleBadge role={record.evidence_role} />
+                      </td>
+                      <td style={tdStyle}>
+                        {isNonScoring ? (
+                          <span
+                            title="Esta evidencia contextualiza o aporta calidad, pero no incrementa directamente el score."
+                            style={{ cursor: "help", color: "var(--color-text-muted)" }}
+                          >
+                            —
+                          </span>
+                        ) : (
+                          record.contribution.toFixed(2)
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -204,7 +280,7 @@ function SignalHeader({ signal }: { signal: SignalDetail }) {
         }}
       >
         <div>
-          <p className="caption">Patient ID</p>
+          <p className="caption">ID de paciente</p>
           <h1 style={{ fontSize: 22 }}>{signal.patient_id}</h1>
           <p className="caption" style={{ marginTop: "var(--space-1)" }}>
             {signal.signal_id}
@@ -214,7 +290,7 @@ function SignalHeader({ signal }: { signal: SignalDetail }) {
           <PriorityBadge priority={signal.priority_level} />
           {signal.risk_score !== null && (
             <p className="caption" style={{ marginTop: "var(--space-1)" }}>
-              Score: {signal.risk_score.toFixed(2)}
+              Score de riesgo: {signal.risk_score.toFixed(2)}
             </p>
           )}
         </div>
