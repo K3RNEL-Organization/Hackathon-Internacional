@@ -147,6 +147,55 @@ export const SOURCE_FILE_LABEL: Record<string, string> = {
   "connectivity_events.csv": "Conectividad",
 };
 
+export interface DataQualitySummary {
+  plausibility_issues: number;
+  retransmissions: number;
+  normalized_units: number;
+  temporal_issues: number;
+  encounter_boundary_issues: number;
+  lab_out_of_reference: number;
+}
+
+export interface PlausibilityBreakdownItem {
+  variable_code: string;
+  count: number;
+}
+
+export type DataQualityIssueType =
+  | "PLAUSIBILITY"
+  | "RETRANSMISSION"
+  | "UNIT_NORMALIZED"
+  | "TEMPORAL"
+  | "ENCOUNTER_BOUNDARY"
+  | "LAB_REFERENCE";
+
+export const DATA_QUALITY_ISSUE_TYPE_LABEL: Record<DataQualityIssueType, string> = {
+  PLAUSIBILITY: "Fuera de plausibilidad",
+  RETRANSMISSION: "Retransmisión",
+  UNIT_NORMALIZED: "Unidad normalizada",
+  TEMPORAL: "Inconsistencia temporal",
+  ENCOUNTER_BOUNDARY: "Límite de encounter",
+  LAB_REFERENCE: "Resultado fuera de referencia",
+};
+
+export interface DataQualityIssue {
+  patient_id: string;
+  issue_type: DataQualityIssueType;
+  variable_code: string;
+  value_original: string;
+  value_canonical: string;
+  detected_issue: string;
+  treatment: string;
+  event_datetime: string;
+}
+
+export interface DataQualityIssuesPage {
+  items: DataQualityIssue[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
 export interface SignalDetail {
   signal_id: string;
   patient_id: string;

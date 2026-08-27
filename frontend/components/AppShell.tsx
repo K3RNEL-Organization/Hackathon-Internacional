@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { href: "/dashboard", label: "Dashboard", icon: "◈" },
   { href: "/pacientes", label: "Pacientes", icon: "⌁" },
   { href: "/senales", label: "Señales", icon: "▥" },
+  { href: "/calidad-datos", label: "Calidad de datos", icon: "◎" },
 ];
 
 const ROLE_DISPLAY_LABEL: Record<CurrentUser["role"], string> = {

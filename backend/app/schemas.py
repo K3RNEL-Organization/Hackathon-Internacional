@@ -111,6 +111,47 @@ class EvidenceRecordOut(BaseModel):
     contribution: float
 
 
+class DataQualitySummaryOut(BaseModel):
+    plausibility_issues: int
+    retransmissions: int
+    normalized_units: int
+    temporal_issues: int
+    encounter_boundary_issues: int
+    lab_out_of_reference: int
+
+
+class PlausibilityBreakdownItemOut(BaseModel):
+    variable_code: str
+    count: int
+
+
+class DataQualityIssueType(str, enum.Enum):
+    PLAUSIBILITY = "PLAUSIBILITY"
+    RETRANSMISSION = "RETRANSMISSION"
+    UNIT_NORMALIZED = "UNIT_NORMALIZED"
+    TEMPORAL = "TEMPORAL"
+    ENCOUNTER_BOUNDARY = "ENCOUNTER_BOUNDARY"
+    LAB_REFERENCE = "LAB_REFERENCE"
+
+
+class DataQualityIssueOut(BaseModel):
+    patient_id: str
+    issue_type: DataQualityIssueType
+    variable_code: str
+    value_original: str
+    value_canonical: str
+    detected_issue: str
+    treatment: str
+    event_datetime: datetime
+
+
+class DataQualityIssuesPageOut(BaseModel):
+    items: list[DataQualityIssueOut]
+    total: int
+    page: int
+    page_size: int
+
+
 class SignalDetailOut(BaseModel):
     model_config = {"protected_namespaces": ()}
 

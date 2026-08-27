@@ -87,7 +87,7 @@ export function DashboardView() {
         }}
       >
         <div>
-          <h1>Dashboard clínico</h1>
+          <h1>Dashboard</h1>
           <p className="caption" style={{ marginTop: "var(--space-1)" }}>
             {summary?.last_updated
               ? `Última actualización de señales: ${formatDateTime(summary.last_updated)}`
