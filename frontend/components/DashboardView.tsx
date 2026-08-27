@@ -2,26 +2,27 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { DashboardSummary, PatientSignal } from "@/lib/types";
 import { formatDateTime } from "@/lib/format";
 import { StatCard } from "@/components/StatCard";
 import { PatientSignalCard } from "@/components/PatientSignalCard";
 import { EmptyState } from "@/components/EmptyState";
-import { PriorityFilterBar, PriorityFilterValue } from "@/components/PriorityFilterBar";
 import { PriorityDistributionBar } from "@/components/PriorityDistributionBar";
 
 type LoadStatus = "loading" | "error" | "ready";
+
+const PRIORITY_SIGNALS_LIMIT = 6;
 
 export function DashboardView() {
   const router = useRouter();
   const [status, setStatus] = useState<LoadStatus>("loading");
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
-  const [patients, setPatients] = useState<PatientSignal[]>([]);
-  const [filter, setFilter] = useState<PriorityFilterValue>("ALL");
+  const [prioritySignals, setPrioritySignals] = useState<PatientSignal[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const load = useCallback(
-    async (priority: PriorityFilterValue, mode: "initial" | "refresh" = "initial") => {
+    async (mode: "initial" | "refresh" = "initial") => {
       if (mode === "initial") {
         setStatus("loading");
       } else {
@@ -29,26 +30,32 @@ export function DashboardView() {
       }
 
       try {
-        const [summaryRes, patientsRes] = await Promise.all([
+        const [summaryRes, signalsRes] = await Promise.all([
           fetch("/api/dashboard/summary", { cache: "no-store" }),
-          fetch(`/api/dashboard/patients?priority=${priority}`, { cache: "no-store" }),
+          fetch("/api/signals?priority=ALL", { cache: "no-store" }),
         ]);
 
-        if (summaryRes.status === 401 || patientsRes.status === 401) {
+        if (summaryRes.status === 401 || signalsRes.status === 401) {
           router.push("/login");
           return;
         }
 
-        if (!summaryRes.ok || !patientsRes.ok) {
+        if (!summaryRes.ok || !signalsRes.ok) {
           setStatus("error");
           return;
         }
 
         const summaryData: DashboardSummary = await summaryRes.json();
-        const patientsData: PatientSignal[] = await patientsRes.json();
+        const allSignals: PatientSignal[] = await signalsRes.json();
+
+        // Vista de triage: solo lo que requiere atención primero (CRITICAL/HIGH), por risk_score.
+        const priority = allSignals
+          .filter((s) => s.priority_level === "CRITICAL" || s.priority_level === "HIGH")
+          .sort((a, b) => (b.risk_score ?? 0) - (a.risk_score ?? 0))
+          .slice(0, PRIORITY_SIGNALS_LIMIT);
 
         setSummary(summaryData);
-        setPatients(patientsData);
+        setPrioritySignals(priority);
         setStatus("ready");
       } catch {
         setStatus("error");
@@ -60,12 +67,11 @@ export function DashboardView() {
   );
 
   useEffect(() => {
-    load(filter, "initial");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter]);
+    load("initial");
+  }, [load]);
 
-  function handleSelectPatient(signal: PatientSignal) {
-    router.push(`/pacientes/${signal.patient_id}`);
+  function handleSelectSignal(signal: PatientSignal) {
+    router.push(`/senales/${signal.signal_id}`);
   }
 
   return (
@@ -91,7 +97,7 @@ export function DashboardView() {
         <button
           type="button"
           className="btn btn-secondary"
-          onClick={() => load(filter, "refresh")}
+          onClick={() => load("refresh")}
           disabled={isRefreshing || status === "loading"}
         >
           {isRefreshing ? "Actualizando..." : "↻ Actualizar"}
@@ -105,7 +111,7 @@ export function DashboardView() {
           <p style={{ marginBottom: "var(--space-4)" }}>
             No fue posible cargar la información del Dashboard.
           </p>
-          <button type="button" className="btn btn-primary" onClick={() => load(filter, "initial")}>
+          <button type="button" className="btn btn-primary" onClick={() => load("initial")}>
             Reintentar
           </button>
         </div>
@@ -137,26 +143,30 @@ export function DashboardView() {
             />
           </div>
 
-          {summary.active_signals === 0 ? (
-            <EmptyState message="No hay señales activas que requieren revisión en este momento." />
-          ) : (
-            <>
-              <PriorityFilterBar value={filter} onChange={setFilter} allLabel="Todos" />
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "var(--space-3)",
+              marginBottom: "var(--space-4)",
+            }}
+          >
+            <h2>Señales prioritarias</h2>
+            <Link href="/senales" className="btn btn-secondary">
+              Ver todas las señales →
+            </Link>
+          </div>
 
-              {patients.length === 0 ? (
-                <EmptyState message="No hay pacientes disponibles actualmente." />
-              ) : (
-                <div className="card-grid">
-                  {patients.map((signal) => (
-                    <PatientSignalCard
-                      key={signal.signal_id}
-                      signal={signal}
-                      onSelect={handleSelectPatient}
-                    />
-                  ))}
-                </div>
-              )}
-            </>
+          {prioritySignals.length === 0 ? (
+            <EmptyState message="No hay señales críticas o altas que requieran revisión en este momento." />
+          ) : (
+            <div className="card-grid">
+              {prioritySignals.map((signal) => (
+                <PatientSignalCard key={signal.signal_id} signal={signal} onSelect={handleSelectSignal} />
+              ))}
+            </div>
           )}
         </>
       )}

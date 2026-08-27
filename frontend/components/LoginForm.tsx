@@ -88,7 +88,7 @@ export function LoginForm() {
       }}
     >
       <div style={{ display: "flex", justifyContent: "center", marginBottom: "var(--space-5)" }}>
-        <Image src="/logo.png" alt="RISA Data" width={180} height={49} priority />
+        <Image src="/logo-light.png" alt="RISA Data" width={200} height={42} priority />
       </div>
 
       <h1 style={{ fontSize: 20, textAlign: "center", marginBottom: "var(--space-1)" }}>

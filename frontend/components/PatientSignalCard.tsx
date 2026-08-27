@@ -45,7 +45,10 @@ export function PatientSignalCard({
         )}
       </div>
 
-      <h3 style={{ marginBottom: "var(--space-2)" }}>{signal.patient_id}</h3>
+      <h3 style={{ marginBottom: "var(--space-1)" }}>{signal.patient_id}</h3>
+      <p className="caption" style={{ marginBottom: "var(--space-2)" }}>
+        {signal.signal_id}
+      </p>
 
       <p
         className="caption"

@@ -65,7 +65,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       />
       <aside className={`sidebar ${isSidebarOpen ? "sidebar--open" : ""}`}>
         <div className="sidebar__brand">
-          <Image src="/logo.png" alt="RISA Data" width={130} height={35} priority />
+          <Image src="/logo.png" alt="RISA Data" width={150} height={31} priority />
         </div>
 
         {showProfessionalNav && (
@@ -84,14 +84,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         )}
 
         <div className="sidebar__footer">
-          <div className="sidebar__status">
-            <span className="status-dot status-dot--online" aria-hidden="true" />
-            <div>
-              <strong style={{ display: "block", color: "#e1f4f4" }}>RISA Data v1.0</strong>
-              <small>Sesión activa</small>
-            </div>
-          </div>
-
           <div style={{ position: "relative" }}>
             <button
               type="button"

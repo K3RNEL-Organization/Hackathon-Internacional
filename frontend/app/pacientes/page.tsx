@@ -1,12 +1,10 @@
 import { AppShell } from "@/components/AppShell";
+import { PacientesView } from "@/components/PacientesView";
 
 export default function PacientesPage() {
   return (
     <AppShell>
-      <h1>Pacientes</h1>
-      <p style={{ marginTop: "var(--space-4)" }}>
-        Próximamente: listado completo de pacientes, búsqueda y filtros.
-      </p>
+      <PacientesView />
     </AppShell>
   );
 }
