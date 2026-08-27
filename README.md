@@ -184,8 +184,6 @@ El frontend utiliza **Next.js App Router** y no recalcula el `risk_score` ni mod
 
 # 5. Estructura general del proyecto
 
-# 5. Estructura general del proyecto
-
 La solución se encuentra organizada en los siguientes componentes:
 
 ```text
