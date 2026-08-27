@@ -1,4 +1,4 @@
-# Encabezado
+# 1. Encabezado
 
 TriageMed es un prototipo desarrollado para HealthSignal LATAM utilizando
 RISA Data V1.0.
@@ -13,7 +13,7 @@ Cabe aclarar que:
 - TriageMed es una herramienta tecnológica de apoyo.
 - No genera diagnósticos, prescripciones ni decisiones clínicas autónomas.
 
-# Problema
+# 2. Problema
 
 Los datos de salud pueden encontrarse fragmentados entre signos vitales,
 wearables, laboratorios, dispositivos y fuentes contextuales.
@@ -23,7 +23,7 @@ TriageMed busca analizar conjuntamente la evolución temporal, el baseline
 personal, el contexto y la calidad de los datos para detectar patrones que
 merecen revisión profesional.
 
-# Arquitectura
+# 3. Arquitectura
 
 La arquitectura implementada es la siguiente:
 
@@ -48,7 +48,7 @@ flowchart TD
     J --> K[Dashboard TriageMed]
 ```
 
-# Fuentes RISA utilizadas
+# 4. Fuentes RISA utilizadas
 
 Las fuentes RISA utilizadas fueron:
 
@@ -59,7 +59,7 @@ Las fuentes RISA utilizadas fueron:
 - connectivity_events.csv
 - laboratory_results.csv
 
-# Tecnologías
+# 5. Tecnologías utilizadas
 
 Se emplearon las siguientes tecnologías:
 
@@ -102,7 +102,7 @@ Se emplearon las siguientes tecnologías:
 - pip + entorno virtual `.venv` (backend)
 - ESLint/TypeScript compiler (`tsc --noEmit`, `next lint`) para verificación
 
-# Instalación
+# 6. Instalación
 
 ## Requisitos Previos
 
