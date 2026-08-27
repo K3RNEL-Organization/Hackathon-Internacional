@@ -253,7 +253,7 @@ Entre las dependencias principales se encuentran:
 
 ## Requisitos previos
 
-- Python 3.12+
+- Python 3.12
 - Node.js 20+
 - npm
 - Git
