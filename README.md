@@ -110,37 +110,89 @@ Se emplearon las siguientes tecnologías:
 - Node.js 20+ (con npm)
 - Git
 
-## Instalacion
+## Instalación y ejecución
 
-1. Clonar el repositorio
+### 1. Clonar el repositorio
 
-`git clone https://github.com/K3RNEL-Organization/Hackathon-Internacional.git`
-`cd Hackathon-Internacional`
+```bash
+git clone https://github.com/K3RNEL-Organization/Hackathon-Internacional.git
+cd Hackathon-Internacional
+```
 
-2. Backend (FastAPI)
+### 2. Backend (FastAPI)
 
-`cd backend`
-`python -m venv .venv`
-`.venv\Scripts\Activate.ps1      # PowerShell`
-`# .venv\Scripts\activate.bat    # CMD`
-`pip install -r requirements.txt`
+```bash
+cd backend
+python -m venv .venv
+```
+
+#### PowerShell
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+#### CMD
+
+```cmd
+.venv\Scripts\activate.bat
+```
+
+Instalar dependencias:
+
+```bash
+pip install -r requirements.txt
+```
 
 Levantar el servidor:
 
-`uvicorn app.main:app --reload --port 8000`
+```bash
+uvicorn app.main:app --reload --port 8000
+```
 
-Queda disponible en `http://localhost:8000`. Al arrancar, crea automáticamente una base SQLite local con dos usuarios de prueba (uno por rol).
+El backend queda disponible en:
 
-3. Frontend (Next.js)
+`http://localhost:8000`
 
-`cd frontend`
-`copy .env.local.example .env.local    # Windows`
-`# cp .env.local.example .env.local    # Linux/Mac`
-`npm install`
-`npm run dev`
+Al arrancar, crea automáticamente una base SQLite local con dos usuarios de prueba, uno por cada rol.
 
-Queda disponible en `http://localhost:3000`.
+### 3. Frontend (Next.js)
 
-4. Uso
+```bash
+cd frontend
+```
 
-Con ambos servidores corriendo, abrir `http://localhost:3000` en el navegador e iniciar sesión con alguno de los usuarios de prueba definidos en `backend/app/seed.py`.
+#### Windows
+
+```cmd
+copy .env.local.example .env.local
+```
+
+#### Linux / macOS
+
+```bash
+cp .env.local.example .env.local
+```
+
+Instalar dependencias y levantar el servidor:
+
+```bash
+npm install
+npm run dev
+```
+
+El frontend queda disponible en:
+
+`http://localhost:3000`
+
+### 4. Uso
+
+Con ambos servidores corriendo, abrir:
+
+`http://localhost:3000`
+
+Iniciar sesión con alguno de los usuarios de prueba definidos en:
+
+`backend/app/seed.py`
+
+
