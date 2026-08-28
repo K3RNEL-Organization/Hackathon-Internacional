@@ -19,15 +19,10 @@ export function DashboardView() {
   const [status, setStatus] = useState<LoadStatus>("loading");
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [prioritySignals, setPrioritySignals] = useState<PatientSignal[]>([]);
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const load = useCallback(
-    async (mode: "initial" | "refresh" = "initial") => {
-      if (mode === "initial") {
-        setStatus("loading");
-      } else {
-        setIsRefreshing(true);
-      }
+    async () => {
+      setStatus("loading");
 
       try {
         const [summaryRes, signalsRes] = await Promise.all([
@@ -59,15 +54,13 @@ export function DashboardView() {
         setStatus("ready");
       } catch {
         setStatus("error");
-      } finally {
-        setIsRefreshing(false);
       }
     },
     [router]
   );
 
   useEffect(() => {
-    load("initial");
+    load();
   }, [load]);
 
   function handleSelectSignal(signal: PatientSignal) {
@@ -94,14 +87,6 @@ export function DashboardView() {
               : "Señales de riesgo detectadas por RISA"}
           </p>
         </div>
-        <button
-          type="button"
-          className="btn btn-secondary"
-          onClick={() => load("refresh")}
-          disabled={isRefreshing || status === "loading"}
-        >
-          {isRefreshing ? "Actualizando..." : "↻ Actualizar"}
-        </button>
       </div>
 
       {status === "loading" && <LoadingState />}
